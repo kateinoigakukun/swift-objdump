@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "MachOParser",
+        "repositoryURL": "git@github.com:kateinoigakukun/MachOParser.git",
+        "state": {
+          "branch": "master",
+          "revision": "928fb702d7964634e77dd5b052363cc5027fbd18",
+          "version": null
+        }
+      }
+    ]
+  },
+  "version": 1
+}
