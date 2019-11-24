@@ -14,7 +14,6 @@ class AnalysisVisitor: MachOVisitor {
     var sections: [section_64] = []
     var commandSize: UInt32?
     var symbolTableSize: UInt32?
-    var dynamicSymbolTableSize: UInt32?
 
     var relocationInfoBySection: [String: [relocation_info]] = [:]
     var symbolTable: [String] = []

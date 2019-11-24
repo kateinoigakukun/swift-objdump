@@ -2,7 +2,7 @@ import Foundation
 import MachOParser
 
 func main(arguments: [String]) {
-    let filePath = arguments.first!
+    let filePath = arguments[1]
     let data = NSData(contentsOfFile: filePath)!
     let object = data.bytes
     let parser = MachOParser(object)
