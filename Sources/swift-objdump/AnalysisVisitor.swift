@@ -12,12 +12,12 @@ class AnalysisVisitor: MachOVisitor {
     var segmentContext: SegmentContext?
     var segments: [segment_command_64] = []
     var sections: [section_64] = []
-    var commandSize: UInt32?
-    var symbolTableSize: UInt32?
+    var commandSize: UInt64?
+    var symbolTableSize: UInt64?
 
     var relocationInfoBySection: [String: [relocation_info]] = [:]
     var symbolTable: [String] = []
-    var sizeByCommandName: [String: UInt32] = [:]
+    var sizeByCommandName: [String: UInt64] = [:]
 
     init(objectFile: UnsafeRawPointer) {
         self.objectFile = objectFile
@@ -28,13 +28,13 @@ class AnalysisVisitor: MachOVisitor {
     }
 
     func visit(_ header: UnsafePointer<mach_header_64>) {
-        commandSize = header.pointee.sizeofcmds
+        commandSize = UInt64(header.pointee.sizeofcmds)
     }
 
     func visit(_ command: UnsafePointer<segment_command_64>) {
         segmentContext = SegmentContext(command.pointee)
         segments.append(command.pointee)
-        sizeByCommandName[_typeName(segment_command_64.self), default: 0] += command.pointee.cmdsize
+        sizeByCommandName[_typeName(segment_command_64.self), default: 0] += UInt64(command.pointee.cmdsize)
     }
 
     func visit(_ section: UnsafePointer<section_64>) {
@@ -52,15 +52,15 @@ class AnalysisVisitor: MachOVisitor {
             relocInfo.append(info)
             relocPtr = relocPtr.advanced(by: MemoryLayout<relocation_info>.size)
         }
-        relocationInfoBySection[String(fixedLengthString: section.pointee.sectname)] = relocInfo
+        relocationInfoBySection[String(fixedLengthString: section.pointee.sectname, length: 16)] = relocInfo
     }
 
     func visit(_ section: UnsafePointer<section>) {}
 
     func visit(_ command: UnsafePointer<symtab_command>) {
         assert(symbolTableSize == nil)
-        symbolTableSize = command.pointee.strsize + UInt32(MemoryLayout<nlist_64>.size) * command.pointee.nsyms
-        sizeByCommandName[_typeName(symtab_command.self), default: 0] += command.pointee.cmdsize
+        symbolTableSize = UInt64(command.pointee.strsize) + UInt64(MemoryLayout<nlist_64>.size) * UInt64(command.pointee.nsyms)
+        sizeByCommandName[_typeName(symtab_command.self), default: 0] += UInt64(command.pointee.cmdsize)
 
         let stringsPtr = objectFile.advanced(by: Int(command.pointee.stroff))
         var symPtr = objectFile.advanced(by: Int(command.pointee.symoff))
@@ -76,7 +76,7 @@ class AnalysisVisitor: MachOVisitor {
     }
 
     func visit<LC: LoadCommand>(_ command: UnsafePointer<LC>) {
-        sizeByCommandName[_typeName(LC.self), default: 0] += command.pointee.cmdsize
+        sizeByCommandName[_typeName(LC.self), default: 0] += UInt64(command.pointee.cmdsize)
     }
 }
 

@@ -37,26 +37,4 @@ extension String {
     fileprivate func addingPadding(width: Int) -> String {
         return self + repeatElement(" ", count: width-count)
     }
-
-    fileprivate func centeredPadding(width: Int) -> String {
-        let paddings = (width-self.count)
-        let left = (paddings/2)
-        let right = left + paddings % 2
-        return String(repeatElement(" ", count: left)) + self + repeatElement(" ", count: right)
-    }
-}
-
-extension Array where Element == String {
-    fileprivate func edged(separator: String) -> String {
-        return separator + self.joined(separator: separator) + separator
-    }
-}
-
-extension Array where Element: Equatable {
-    fileprivate func allEqual() -> Bool {
-        if let firstElem = first {
-            return !dropFirst().contains { $0 != firstElem }
-        }
-        return true
-    }
 }
