@@ -11,7 +11,7 @@ let package = Package(
     targets: [
         .target(
             name: "swift-objdump",
-            dependencies: []),
+            dependencies: ["MachOParser"]),
         .testTarget(
             name: "swift-objdumpTests",
             dependencies: ["swift-objdump"]),
