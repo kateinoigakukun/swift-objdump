@@ -121,6 +121,8 @@ extension SizeAnalyzer.Visitor: MachOVisitor {
             symPtr = symPtr.advanced(by: MemoryLayout<nlist_64>.size)
         }
     }
-
+    func visit(_ command: UnsafePointer<dylib_command>) {
+        dump(command.pointee)
+    }
     func visit<LC: LoadCommand>(_ command: UnsafePointer<LC>) {}
 }
