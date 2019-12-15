@@ -195,9 +195,11 @@ public typealias AnyClassMetadata = RuntimeInherit<
     HeapMetadata,
     RuntimePair<
     RuntimePair<
+    RuntimePair<
     RuntimeValue<UnsafePointer<Void /* ClassMetadata */>>, // Superclass
     RuntimeValue<UnsafeRawPointer>> /* CacheData[0] */,
-    RuntimeValue<UnsafeRawPointer>> /* CacheData[1] */
+    RuntimeValue<UnsafeRawPointer>> /* CacheData[1] */,
+    RuntimeValue<Int>> // Data
 >
 
 public typealias TypeContextDescriptor = RuntimeInherit<
@@ -230,17 +232,19 @@ public typealias ResilientClassMetadataPattern = RuntimePair<
     RuntimePair<
     RuntimePair<
     RuntimePair<
+    RuntimePair<
     RelativePointer<MetadataRelocator>,
     RelativePointer<HeapObjectDestroyer>>,
     RelativePointer<ClassIVarDestroyer>>,
     RuntimeValue<ClassFlags>>,
-    RelativePointer<Void>
+    RelativePointer<Void>>, // Data
+    RelativePointer<AnyClassMetadata> // Metaclass
 >
 public typealias SingletonMetadataInitialization = RuntimePair<
     RelativePointer<SingletonMetadataCache>,
     RuntimeUnion<
         RelativePointer<Metadata>,
-
+        RelativePointer<ResilientClassMetadataPattern>
     >
 >
 
