@@ -13,8 +13,8 @@ class RuntimeStructureTests: XCTestCase {
 
         var data = R(value1: 0x80, value2: 0xff)
         let s = S(&data)
-        XCTAssertEqual(s.project1().dereference(), 0x80)
-        XCTAssertEqual(s.project2().dereference(), 0xff)
+        XCTAssertEqual(s.project1().get(), 0x80)
+        XCTAssertEqual(s.project2().get(), 0xff)
     }
 
     func testUnion() {
@@ -22,8 +22,8 @@ class RuntimeStructureTests: XCTestCase {
 
         var data = 0xffff
         let s = S(&data)
-        XCTAssertEqual(s.project1().dereference(), 0xffff)
-        XCTAssertEqual(s.project2().dereference(), 0xff)
+        XCTAssertEqual(s.project1().get(), 0xffff)
+        XCTAssertEqual(s.project2().get(), 0xff)
     }
 
     func testComposition() {
@@ -41,8 +41,8 @@ class RuntimeStructureTests: XCTestCase {
 
         var data = R(value1: 0x80, value2: 0xffff)
         let s = S(&data)
-        XCTAssertEqual(s.project1().dereference(), 0x80)
-        XCTAssertEqual(s.project2().project1().dereference(), 0xffff)
-        XCTAssertEqual(s.project2().project2().dereference(), 0xff)
+        XCTAssertEqual(s.project1().get(), 0x80)
+        XCTAssertEqual(s.project2().project1().get(), 0xffff)
+        XCTAssertEqual(s.project2().project2().get(), 0xff)
     }
 }
