@@ -202,6 +202,33 @@ public typealias AnyClassMetadata = RuntimeInherit<
     RuntimeValue<Int>> // Data
 >
 
+public typealias ClassFullMetadata = RuntimeInherit<
+    AnyClassMetadata,
+    RuntimePair<
+    RuntimePair<
+    RuntimePair<
+    RuntimePair<
+    RuntimePair<
+    RuntimePair<
+    RuntimePair<
+    RuntimeValue<ClassFlags>,
+    RuntimeValue<UInt32>>, // InstanceAddressPoint
+    RuntimeValue<UInt32>>, // InstanceSize
+    RuntimeValue<UInt16>>, // InstanceAlignMask
+    RuntimeValue<UInt16>>, // Reserved
+    RuntimeValue<UInt32>>, // ClassSize
+    RuntimeValue<UInt32>>,  // ClassAddressPoint
+    RuntimeValue<ClassDescriptor>>
+    // TODO
+>
+
+
+extension ClassFullMetadata {
+    var descriptor: ClassDescriptor {
+        return this().project2().get()
+    }
+}
+
 public typealias TypeContextDescriptor = RuntimeInherit<
     ContextDescriptor,
     RuntimePair<
@@ -211,17 +238,26 @@ public typealias TypeContextDescriptor = RuntimeInherit<
     RelativePointer<() -> Void>>
 >
 
+extension TypeContextDescriptor {
+    var name: RelativePointer<CChar> {
+        this().project1().project1()
+    }
+}
+
 public typealias ForeignMetadataInitialization = RelativePointer<() -> Void>
 public typealias SingletonMetadataCache = RuntimePair<
     RuntimeValue<UnsafePointer<Metadata>>,
     RuntimeValue<UnsafeRawPointer>
 >
 
-public enum ClassFlags: UInt32 {
+public struct ClassFlags {
 
-  case IsSwiftPreStableABI = 0x1
-  case UsesSwiftRefcounting = 0x2
-  case HasCustomObjCName = 0x4
+    let value: UInt32
+    enum Flag: UInt32 {
+        case IsSwiftPreStableABI = 0x1
+        case UsesSwiftRefcounting = 0x2
+        case HasCustomObjCName = 0x4
+    }
 }
 
 public typealias MetadataRelocator = () -> Void
@@ -248,7 +284,7 @@ public typealias SingletonMetadataInitialization = RuntimePair<
     >
 >
 
-typealias GenericContextDescriptorHeader = RuntimePair<
+public typealias GenericContextDescriptorHeader = RuntimePair<
     RuntimePair<
     RuntimePair<
     RuntimeValue<UInt16>,
@@ -267,7 +303,7 @@ extension GenericContextDescriptorHeader {
     var hasArguments: Bool { numArguments > 0 }
 }
 
-typealias TypeGenericContextDescriptorHeader = RuntimePair<
+public typealias TypeGenericContextDescriptorHeader = RuntimePair<
     RuntimePair<
     RelativePointer<Void>,
     RelativePointer<Void>>,
@@ -304,36 +340,36 @@ extension ___ClassDescriptor {
     }
 }
 
-typealias __ClassDescriptor = TrailingObject<
+public typealias __ClassDescriptor = TrailingObject<
     ___ClassDescriptor,
     TypeGenericContextDescriptorHeader,
     ClassDescriptorSizer.TypeGenericContextDescriptorHeader
 >
-typealias _ClassDescriptor = TrailingObject<
+public typealias _ClassDescriptor = TrailingObject<
     __ClassDescriptor,
     ResilientSuperclass,
     ClassDescriptorSizer.ResilientSuperclass
 >
-typealias ClassDescriptor = TrailingObject<
+public typealias ClassDescriptor = TrailingObject<
     _ClassDescriptor,
     ForeignMetadataInitialization,
     ClassDescriptorSizer.ForeignMetadataInitialization
 >
 
-enum ClassDescriptorSizer {}
-extension ClassDescriptorSizer {
+public enum ClassDescriptorSizer {}
+public extension ClassDescriptorSizer {
     struct TypeGenericContextDescriptorHeader: TrailingObjectSizer {
-        static func numTrailingObjects(this: ___ClassDescriptor) -> Int {
+        public static func numTrailingObjects(this: ___ClassDescriptor) -> Int {
             this.isGeneric ? 1 : 0
         }
     }
     struct ResilientSuperclass: TrailingObjectSizer {
-        static func numTrailingObjects(this: __ClassDescriptor) -> Int {
+        public static func numTrailingObjects(this: __ClassDescriptor) -> Int {
             this.hasResilientSuperclass ? 1 : 0
         }
     }
     struct ForeignMetadataInitialization: TrailingObjectSizer {
-        static func numTrailingObjects(this: _ClassDescriptor) -> Int {
+        public static func numTrailingObjects(this: _ClassDescriptor) -> Int {
             this.typeContextDescriptorFlags.hasForeignMetadataInitialization ? 1 : 0
         }
     }

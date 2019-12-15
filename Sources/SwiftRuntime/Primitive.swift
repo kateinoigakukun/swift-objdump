@@ -42,7 +42,10 @@ public struct RuntimeUnion<E1: RuntimeStruct, E2: RuntimeStruct>: RuntimeStruct 
 }
 
 public struct RuntimeValue<E>: RuntimeStruct {
-    public var size: Int { MemoryLayout<E>.size }
+    public var size: Int {
+        print("Size of \(E.self) is \(MemoryLayout<E>.size)")
+        return MemoryLayout<E>.size
+    }
     private let ptr: UnsafeRawPointer
 
     public func get() -> E { ptr.load(as: E.self) }

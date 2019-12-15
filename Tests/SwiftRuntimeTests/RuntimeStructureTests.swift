@@ -45,4 +45,15 @@ class RuntimeStructureTests: XCTestCase {
         XCTAssertEqual(s.project2().project1().get(), 0xffff)
         XCTAssertEqual(s.project2().project2().get(), 0xff)
     }
+
+    class ExampleClass {
+        let value: Int = 0
+    }
+    func testParseClassMetadata() {
+        let ptr = unsafeBitCast(ExampleClass.self, to: UnsafeRawPointer.self).advanced(by: -8)
+        let metadata = ClassFullMetadata(ptr)
+        let name = String(cString: metadata.descriptor.name.get())
+
+        XCTAssertEqual(name, "ExampleClass")
+    }
 }
