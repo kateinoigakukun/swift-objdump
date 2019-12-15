@@ -3,6 +3,24 @@ public protocol RuntimeStruct {
     init(_: UnsafeRawPointer)
 }
 
+@dynamicMemberLookup
+public struct RuntimeInherit<Parent: RuntimeStruct, This: RuntimeStruct>: RuntimeStruct {
+    private let ptr: UnsafeRawPointer
+
+    public func parent() -> Parent { Parent(ptr) }
+    public func this() -> This { This(ptr.advanced(by: parent().size)) }
+
+    public var size: Int { parent().size + this().size }
+    public init(_ ptr: UnsafeRawPointer) { self.ptr = ptr }
+
+    subscript<U>(dynamicMember keyPath: KeyPath<This, U>) -> U {
+        return this()[keyPath: keyPath]
+    }
+    subscript<U>(dynamicMember keyPath: KeyPath<Parent, U>) -> U {
+        return parent()[keyPath: keyPath]
+    }
+}
+
 public struct RuntimePair<E1: RuntimeStruct, E2: RuntimeStruct>: RuntimeStruct {
     private let ptr: UnsafeRawPointer
 
@@ -48,8 +66,8 @@ public struct RelativePointer<Pointee>: RuntimeStruct {
     }
 }
 
-public struct RelativeDirectPointerIntPair<Pointee, IntTy: ExpressibleByIntegerLiteral>: RuntimeStruct
-    where IntTy.IntegerLiteralType == Int32
+public struct RelativeDirectPointerIntPair<Pointee, IntTy: RawRepresentable>: RuntimeStruct
+    where IntTy.RawValue == Int32
 {
     let thisPtr: UnsafeRawPointer
 
@@ -69,7 +87,7 @@ public struct RelativeDirectPointerIntPair<Pointee, IntTy: ExpressibleByIntegerL
 
     public func getValue() -> IntTy {
         let offsetWithInt = thisPtr.load(as: Int32.self)
-        return IntTy(integerLiteral: offsetWithInt & intMask)
+        return IntTy(rawValue: offsetWithInt & intMask)!
     }
 
     var intMask: Int32 {
